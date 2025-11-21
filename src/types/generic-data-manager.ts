@@ -15,7 +15,12 @@ export interface Entity {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any; 
 }
-
+export interface CustomAction {
+  label: string;
+  onClick: (item: Entity) => void;
+  className?: string;
+  icon?: React.ReactNode;
+}
 export interface PaginationMeta {
   current_page: number;
   last_page: number;
@@ -87,6 +92,8 @@ export interface GenericDataManagerProps {
   showFilter?: boolean;
   showBulkActions?: boolean;
   showDeletedToggle?: boolean;
+    customActions?: CustomAction[];
+     showCustomActions?: boolean;
 }
 
 export interface ColumnDefinition {

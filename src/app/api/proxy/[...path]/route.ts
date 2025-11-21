@@ -6,7 +6,7 @@ async function proxyRequest(
   method: string,
   endpoint: string,
   body?: Record<string, string | number>,
-  cookies?: string
+  request?: NextRequest
 ) {
   const url = `${baseUrl}/${endpoint}`;
   
@@ -14,18 +14,20 @@ async function proxyRequest(
     'Content-Type': 'application/json',
   };
 
-  // Extract token from cookies and set it as Authorization header
-  if (cookies) {
-    const decodedCookies = decodeURIComponent(cookies);
-    const tokenMatch = decodedCookies.match(/token=([^;]+)/);
+  // استخراج التوكن من الكوكيز - بدون فك تشفير مزدوج
+  const cookies = request?.headers.get('cookie') || '';
+  console.log('🍪 Raw cookies:', cookies);
+  
+  const tokenMatch = cookies.match(/token=([^;]+)/);
+  if (tokenMatch) {
+    // فك تشفير URL مرة واحدة فقط - استخدام const بدلاً من let
+    const token = decodeURIComponent(tokenMatch[1]);
+    console.log('🔐 Decoded token:', token);
     
-    if (tokenMatch) {
-      const token = tokenMatch[1];
-      // Set Authorization header instead of Cookie header
-      headers['Authorization'] = `Bearer ${token}`;
-      
-      console.log('Token found, setting Authorization header:', headers['Authorization']);
-    }
+    headers['Authorization'] = `Bearer ${token}`;
+    console.log('✅ Setting Authorization header with token');
+  } else {
+    console.log('❌ No token found in cookies');
   }
 
   const fetchOptions: RequestInit = {
@@ -33,11 +35,15 @@ async function proxyRequest(
     headers,
   };
 
-  if (body && ['POST', 'PUT', 'PATCH','DELETE'].includes(method)) {
+  if (body && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
     fetchOptions.body = JSON.stringify(body);
   }
 
+  console.log('🚀 Proxying request to:', url);
+  console.log('📋 Headers:', headers);
+
   const response = await fetch(url, fetchOptions);
+  
   const contentType = response.headers.get('content-type') || '';
   const isJson = contentType.includes('application/json');
   const data = isJson ? await response.json() : await response.text();
@@ -45,7 +51,51 @@ async function proxyRequest(
   return { response, data };
 }
 
+// POST - أصلح حفظ التوكن
+export async function POST(request: NextRequest) {
+  const url = new URL(request.url);
+  const path = url.pathname.split('/api/proxy/')[1].split('/');
+  
+  const endpoint = path.join('/');
+  const body = await request.json();
 
+  const { response, data } = await proxyRequest('POST', endpoint, body, request);
+
+  const res = NextResponse.json(data, { status: response.status });
+
+  // إذا كان طلب تسجيل دخول ناجح
+  if (endpoint === 'admin/login' && response.ok && data && data.token) {
+    console.log('✅ Login Successful. Raw token:', data.token);
+    
+    // حفظ التوكن بدون تشفير مزدوج
+    const tokenValue = data.token; // لا تستخدم encodeURIComponent هنا
+    
+    res.cookies.set({
+      name: 'token',
+      value: tokenValue,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/',
+    });
+
+    console.log('🍪 Token saved in cookies (raw):', tokenValue.substring(0, 20) + '...');
+  }
+
+  return res;
+}
+
+// GET وأساليب أخرى تبقى كما هي
+export async function GET(request: NextRequest) {
+  const url = new URL(request.url);
+  const path = url.pathname.split('/api/proxy/')[1].split('/');
+  
+  const endpoint = path.join('/');
+
+  const { response, data } = await proxyRequest('GET', endpoint, undefined, request);
+  return NextResponse.json(data, { status: response.status });
+}
 
 // PATCH
 export async function PATCH(request: NextRequest) {
@@ -54,49 +104,9 @@ export async function PATCH(request: NextRequest) {
   
   const endpoint = path.join('/');
   const body = await request.json();
-  const cookies = request.headers.get('cookie') || '';
 
-  const { response, data } = await proxyRequest('PATCH', endpoint, body, cookies);
+  const { response, data } = await proxyRequest('PATCH', endpoint, body, request);
   return NextResponse.json(data, { status: response.status });
-}
-
-// GET
-export async function GET(request: NextRequest) {
-  const url = new URL(request.url);
-  const path = url.pathname.split('/api/proxy/')[1].split('/');
-  
-  const endpoint = path.join('/');
-  const cookies = request.headers.get('cookie') || '';
-
-  const { response, data } = await proxyRequest('GET', endpoint, undefined, cookies);
-  return NextResponse.json(data, { status: response.status });
-}
-
-// POST
-export async function POST(request: NextRequest) {
-  const url = new URL(request.url);
-  const path = url.pathname.split('/api/proxy/')[1].split('/');
-  
-  const endpoint = path.join('/');
-  const body = await request.json();
-  const cookies = request.headers.get('cookie') || '';
-
-  const { response, data } = await proxyRequest('POST', endpoint, body, cookies);
-
-  const res = NextResponse.json(data, { status: response.status });
-
-  if (endpoint === 'login' && response.ok && typeof data === 'object' && 'token' in data) {
-    console.log('Login Successful. Setting Token in Cookies:', data.token); 
-    res.cookies.set('token', data.token, {
-      httpOnly: true,
-      path: '/',
-      maxAge: 60 * 60 * 24, 
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-    });
-  }
-
-  return res;
 }
 
 // PUT
@@ -106,9 +116,8 @@ export async function PUT(request: NextRequest) {
   
   const endpoint = path.join('/');
   const body = await request.json();
-  const cookies = request.headers.get('cookie') || '';
 
-  const { response, data } = await proxyRequest('PUT', endpoint, body, cookies);
+  const { response, data } = await proxyRequest('PUT', endpoint, body, request);
   return NextResponse.json(data, { status: response.status });
 }
 
@@ -118,19 +127,14 @@ export async function DELETE(request: NextRequest) {
   const path = url.pathname.split('/api/proxy/')[1].split('/');
   
   const endpoint = path.join('/');
-  const cookies = request.headers.get('cookie') || '';
 
   let body = undefined;
   try {
     body = await request.json();
-  } catch (err) {
-    console.log('No body in DELETE request (may be fine)');
+  } catch {
+    // No body - هذا طبيعي، إزالة المتغير غير المستخدم
   }
 
-  const { response, data } = await proxyRequest('DELETE', endpoint, body, cookies);
-
-  console.log('🗑️ DELETE Request to:', endpoint, 'Body:', body);
-  console.log('🧾 DELETE Response:', data);
-
+  const { response, data } = await proxyRequest('DELETE', endpoint, body, request);
   return NextResponse.json(data, { status: response.status });
 }

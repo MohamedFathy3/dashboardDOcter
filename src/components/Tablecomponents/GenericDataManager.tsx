@@ -27,6 +27,7 @@ import {
   PaginationMeta,
   FilterField,
   SaveOptions,
+    CustomAction
 } from "@/types/generic-data-manager";
 
 interface ExtendedHeaderProps extends HeaderProps {
@@ -283,7 +284,8 @@ export default function GenericDataManager(props: GenericDataManagerProps): Reac
     showActiveToggle = true,
     showSearch = true,
     showBulkActions = true,
-    showDeletedToggle = true
+    showDeletedToggle = true,
+       showCustomActions = true
   } = props;
 
   // استخدام pagination آمن مع قيمة افتراضية
@@ -468,6 +470,8 @@ export default function GenericDataManager(props: GenericDataManagerProps): Reac
                 showEditButton={showEditButton}
               showDeleteButton={showDeleteButton}
               showActiveToggle={showActiveToggle}
+              showCustomActions={showCustomActions}
+               customActions={props.customActions || []} 
             />
           </div>
 
@@ -652,58 +656,7 @@ const Header: React.FC<ExtendedHeaderProps & {
         )}
 
         {/* باقي الأزرار تبقى كما هي */}
-        <Button 
-          onClick={onToggleDeleted} 
-          className={`
-            relative
-            overflow-hidden
-            bg-gradient-to-r
-            from-red-50
-            to-red-100
-            dark:from-red-900/30
-            dark:to-red-800/30
-            hover:from-red-100
-            hover:to-red-200
-            dark:hover:from-red-800/40
-            dark:hover:to-red-700/40
-            text-black
-            dark:text-red-200
-            font-semibold
-            py-3
-            px-6
-            rounded-2xl
-            shadow-md
-            hover:shadow-lg
-            transform
-            hover:-translate-y-0.5
-            active:translate-y-0
-            transition-all
-            duration-250
-            ease-in-out
-            border
-            border-red-100
-            dark:border-red-900/50
-            group
-          `}
-        >
-          <span className="flex items-center gap-3">
-            {showingDeleted ? (
-              <>
-                <div className="bg-red-100 dark:bg-red-900/30 p-2 rounded-lg group-hover:scale-110 transition-transform duration-200">
-                  <i className="fas fa-arrow-left text-red-600 dark:text-red-400 text-sm"></i>
-                </div>
-                <span className="text-red-700 dark:text-red-300">Back to Active Items</span>
-              </>
-            ) : (
-              <>
-                <div className="bg-gradient-to-r from-red-50 to-red-100 dark:bg-red-900/30 p-2 rounded-lg group-hover:scale-110 transition-transform duration-200">
-                  <i className="fas fa-trash-can text-red-600 dark:text-red-400 text-sm"></i>
-                </div>
-                <span className="text-black dark:text-red-300">Show Deleted Items</span>
-              </>
-            )}
-          </span>
-        </Button>
+        
  {showAddButton && (
         <Button
           className={`
@@ -763,7 +716,9 @@ const Header: React.FC<ExtendedHeaderProps & {
     compactView?: boolean;
        showEditButton?:boolean,
   showDeleteButton?:boolean,
-  showActiveToggle?:boolean
+  showActiveToggle?:boolean,
+    showCustomActions?: boolean;
+    customActions?: CustomAction[]; 
   }> = ({
     title, data, columns, selectedItems, allSelected, someSelected,
     orderBy, orderByDirection, pagination, onToggleSelectAll, onToggleSelectItem,
@@ -772,7 +727,9 @@ const Header: React.FC<ExtendedHeaderProps & {
     compactView = false,  
      showEditButton = true,
   showDeleteButton = true,
-  showActiveToggle = true
+  showActiveToggle = true,
+   customActions = [] ,
+     showCustomActions = true,
   }) => {
     
     // تحديد إذا كان هناك أي عمود صورة
@@ -978,8 +935,7 @@ const Header: React.FC<ExtendedHeaderProps & {
                   </th>
                 ))
               )}
-              {/* إخفاء عمود الإجراءات إذا لم يكن هناك أي أزرار مسموح بها */}
-              {(showEditButton || showDeleteButton || showActiveToggle) && (
+     {(showEditButton || showDeleteButton || showActiveToggle || (showCustomActions && customActions.length > 0)) && (
                 <th className="px-6 py-3 text-center text-gray-700 dark:text-gray-300 font-medium uppercase tracking-wider">
                   Actions
                 </th>
@@ -1077,7 +1033,7 @@ const Header: React.FC<ExtendedHeaderProps & {
                     )}
                     
                     {/* إخفاء خلية الإجراءات إذا لم يكن هناك أي أزرار مسموح بها */}
-                    {(showEditButton || showDeleteButton || showActiveToggle) && (
+                    {(showEditButton || showDeleteButton || showActiveToggle || (showCustomActions && customActions.length > 0)) && (
                       <td className="px-6 py-4">
                         <div className="flex justify-center items-center gap-2">
                           {showingDeleted ? (
@@ -1149,7 +1105,26 @@ const Header: React.FC<ExtendedHeaderProps & {
                                   </span>
                                 </div>
                               )}
-                              
+          {showCustomActions && customActions.map((action, index) => (
+                            <Button
+                              key={index}
+                              variant="outline"
+                              size="sm"
+                              onClick={() => action.onClick(item)}
+                              className={action.className || `
+                                relative overflow-hidden bg-gradient-to-r from-blue-50 to-blue-100 
+                                text-black dark:from-blue-900/30 dark:to-blue-800/30 
+                                hover:from-blue-100 hover:to-blue-200 dark:hover:from-blue-800/40 
+                                dark:hover:to-blue-700/40 dark:text-blue-200 font-semibold py-2 px-4 
+                                rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 
+                                active:translate-y-0 transition-all duration-250 ease-in-out 
+                                border border-blue-100 dark:border-blue-900/50 group
+                              `}
+                            >
+                              {action.icon}
+                              {action.label}
+                            </Button>
+                          ))}
                               {/* زر التعديل - يظهر فقط إذا كان مسموحاً به */}
                               {showEditButton && (
                                 <Button

@@ -216,36 +216,73 @@ const additionalQueriesArray = useQueries({
   };
 
   // تطبيق البحث والفلترة
-  const applySearchAndFilters = useCallback((): void => {
-    if (!allData || !allData.length) {
-      setFilteredData([]);
-      return;
+// استبدل دالة الفلترة بهذه النسخة المحسنة
+const applySearchAndFilters = useCallback((): void => {
+  if (!allData || !allData.length) {
+    setFilteredData([]);
+    return;
+  }
+
+  console.log('🔍 Applying filters:', {
+    allDataLength: allData.length,
+    filters,
+    orderBy,
+    orderByDirection,
+    sampleItem: allData[0] // لعرض عينة من البيانات
+  });
+
+  let result = [...allData];
+
+  // تطبيق الفلاتر العادية أولاً (باستثناء search)
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value.toString().trim() !== '' && key !== 'search') {
+      console.log(`🔍 Applying filter: ${key} = ${value} (type: ${typeof value})`);
+      
+      const filterValue = value.toString().toLowerCase().trim();
+      
+      result = result.filter(item => {
+        const itemValue = item[key];
+        
+        // إذا كانت القيمة null أو undefined، استبعده
+        if (itemValue === null || itemValue === undefined) {
+          return false;
+        }
+        
+        // تحويل قيمة العنصر للنص للمقارنة
+        const itemValueStr = String(itemValue).toLowerCase().trim();
+        
+        // مقارنة مرنة تأخذ في الاعتبار الحالات الخاصة
+        if (key === 'active' || key === 'has_clinic') {
+          // للحقول المنطقية: مقارنة "1" مع true و "0" مع false
+          if (filterValue === '1') {
+            return itemValue === true || itemValue === 1 || itemValueStr === 'true' || itemValueStr === '1';
+          } else if (filterValue === '0') {
+            return itemValue === false || itemValue === 0 || itemValueStr === 'false' || itemValueStr === '0';
+          }
+        }
+        
+        // المقارنة العادية للنصوص
+        return itemValueStr.includes(filterValue);
+      });
+      
+      console.log(`🔍 After filter ${key}: ${result.length} items`);
     }
+  });
 
-    let result = [...allData];
+  // تطبيق البحث الشامل بعد الفلاتر العادية
+  if (filters.search && filters.search.toString().trim()) {
+    const searchTerm = filters.search.toString().toLowerCase().trim();
+    console.log(`🔍 Applying search: "${searchTerm}"`);
+    
+    result = result.filter(item => searchInAllFields(item, searchTerm));
+    console.log(`🔍 After search: ${result.length} items`);
+  }
 
-    // تطبيق البحث الشامل
-    if (filters.search && filters.search.trim()) {
-      result = result.filter(item => 
-        searchInAllFields(item, filters.search)
-      );
-    }
-
-    // تطبيق الفلاتر العادية
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value && value.trim() && key !== 'search') {
-        result = result.filter(item => {
-          const itemValue = item[key];
-          if (itemValue === null || itemValue === undefined) return false;
-          return String(itemValue).toLowerCase().includes(value.toLowerCase().trim());
-        });
-      }
-    });
-
-    // تطبيق الترتيب
+  // تطبيق الترتيب
+  if (orderBy) {
     result.sort((a, b) => {
-      const aValue = a[orderBy];
-      const bValue = b[orderBy];
+      const aValue = a[orderBy] ?? '';
+      const bValue = b[orderBy] ?? '';
       
       if (orderByDirection === 'asc') {
         return String(aValue).localeCompare(String(bValue));
@@ -253,10 +290,11 @@ const additionalQueriesArray = useQueries({
         return String(bValue).localeCompare(String(aValue));
       }
     });
+  }
 
-    setFilteredData(result);
-  }, [allData, filters, orderBy, orderByDirection]);
-
+  console.log('🔍 Final filtered data:', result);
+  setFilteredData(result);
+}, [allData, filters, orderBy, orderByDirection]);
   // تطبيق البحث لما البيانات أو الفلاتر تتغير
   useEffect(() => {
     applySearchAndFilters();
@@ -441,7 +479,7 @@ const saveItemMutation = useMutation<unknown, Error, {
     try {
       await apiToggleActive(id, !currentActive);
       queryClient.invalidateQueries({ queryKey: [endpoint] });
-      toast.success(`Device ${currentActive ? 'deactivated' : 'activated'} successfully!`);
+      toast.success(` ${currentActive ? 'deactivated' : 'activated'} successfully!`);
     } catch (error) {
       console.error('Error toggling device active status:', error);
       toast.error('Error updating device status');
