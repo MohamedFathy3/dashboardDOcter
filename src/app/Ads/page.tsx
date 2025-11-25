@@ -205,6 +205,8 @@ export default function UsersPage() {
         // الفلترز الجديدة المطلوبة
    
       ]}
+       initialData={{ is_ad_request: 1 }} // علشان يبعت type عند الحفظ
+      defaultFilters={{ is_ad_request: "1" }} 
     />
   );
 }
