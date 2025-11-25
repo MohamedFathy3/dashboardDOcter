@@ -16,17 +16,7 @@ export default function UsersPage() {
       endpoint="user"
       title="Users"
       columns={[
-        { 
-          key: 'id', 
-          label: 'ID', 
-          sortable: true,
-          render: (item) => {
-            const ep = "User";
-            const firstLetter = ep[0]?.toUpperCase() || 'U';
-            const lastLetter = ep[ep.length - 1]?.toUpperCase() || 'U';
-            return `${firstLetter}${lastLetter}${String(item.id).padStart(3, '0')}`;
-          }
-        },
+        
         { 
           key: 'user_name', 
           label: 'Username', 
