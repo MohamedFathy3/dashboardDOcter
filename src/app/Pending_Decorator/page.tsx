@@ -37,11 +37,7 @@ export default function UsersPage() {
           label: 'First Name', 
           sortable: true 
         },
-        { 
-          key: 'last_name', 
-          label: 'Last Name', 
-          sortable: true 
-        },
+      
         { 
           key: 'email', 
           label: 'Email', 
@@ -88,48 +84,8 @@ export default function UsersPage() {
             </span>
           )
         },
-        { 
-          key: 'has_clinic', 
-          label: 'Has Clinic', 
-          sortable: true,
-          render: (item) => (
-            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-              item.has_clinic 
-                ? 'bg-blue-100 text-blue-800' 
-                : 'bg-gray-100 text-gray-800'
-            }`}>
-              {item.has_clinic ? 'Yes' : 'No'}
-            </span>
-          )
-        },
-        { 
-          key: 'fields', 
-          label: 'Specializations', 
-          sortable: false,
-          render: (item) => (
-            <div className="max-w-xs">
-              {item.fields && item.fields.length > 0 ? (
-                <div className="flex flex-wrap gap-1">
-                  {item.fields.slice(0, 2).map((field: TableField, index: number) => (
-                    <span 
-                      key={field.id || index}
-                      className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs"
-                    >
-                      {field.name}
-                    </span>
-                  ))}
-                  {item.fields.length > 2 && (
-                    <span className="px-2 py-1 bg-gray-200 text-gray-600 rounded text-xs">
-                      +{item.fields.length - 2} more
-                    </span>
-                  )}
-                </div>
-              ) : (
-                <span className="text-gray-400 text-sm">No specializations</span>
-              )}
-            </div>
-          )
-        },
+       
+      
       ]}
      
            customActions={[

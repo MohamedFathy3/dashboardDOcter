@@ -29,20 +29,10 @@ export default function RentsPage() {
           sortable: true,
           render: (item) => item.type ? item.type.charAt(0).toUpperCase() + item.type.slice(1) : 'N/A'
         },
-        { 
-          key: 'duration', 
-          label: 'Duration', 
-          sortable: true,
-          render: (item) => item.duration ? `${item.duration} days` : 'N/A'
-        },
+       
     
       
-        { 
-          key: 'address', 
-          label: 'Address', 
-          sortable: false,
-          render: (item) => item.address || 'N/A'
-        },
+      
         { 
           key: 'active', 
           label: 'Status', 

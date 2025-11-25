@@ -14,7 +14,7 @@ export default function ProductsPage() {
       
         { 
           key: 'name', 
-          label: 'Product Name', 
+          label: ' Name', 
           sortable: true 
         },
         { 
@@ -23,18 +23,8 @@ export default function ProductsPage() {
           sortable: true,
           render: (item) => `£${item.price}`
         },
-        { 
-          key: 'discount', 
-          label: 'Discount', 
-          sortable: true,
-          render: (item) => item.discount ? `${item.discount}%` : 'No Discount'
-        },
-        { 
-          key: 'price_after_discount', 
-          label: 'Final Price', 
-          sortable: true,
-          render: (item) => `£${item.price_after_discount || item.price}`
-        },
+      
+      
         { 
           key: 'is_new', 
           label: 'New', 
@@ -133,18 +123,7 @@ export default function ProductsPage() {
             );
           }
         },
-        { 
-          key: 'des', 
-          label: 'Description', 
-          sortable: false,
-          render: (item) => (
-            <div className="max-w-xs">
-              <p className="text-sm text-gray-600 truncate">
-                {item.des || 'No description'}
-              </p>
-            </div>
-          )
-        },
+      
      
       ]}
      

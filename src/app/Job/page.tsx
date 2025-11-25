@@ -32,22 +32,7 @@ export default function JobsPage() {
           label: 'Title', 
           sortable: true 
         },
-        { 
-          key: 'company', 
-          label: 'Company', 
-          sortable: true,
-          render: (item) => {
-            if (typeof item.company === 'object' && item.company !== null && 'name' in item.company) {
-              return item.company.name;
-            }
-            return item.company || 'N/A';
-          }
-        },
-        { 
-          key: 'location', 
-          label: 'Location', 
-          sortable: true 
-        },
+       
         { 
           key: 'type', 
           label: 'Type', 

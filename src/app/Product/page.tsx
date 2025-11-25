@@ -72,54 +72,7 @@ export default function ProductsPage() {
             return 'N/A';
           }
         },
-        { 
-          key: 'gallery', 
-          label: 'Gallery', 
-          sortable: false,
-          render: (item) => {
-            // التحقق من وجود gallery وانه ليس مصفوفة فارغة
-            if (item.gallery && Array.isArray(item.gallery) && item.gallery.length > 0) {
-              // البحث عن أول صورة صالحة في المصفوفة (من الـ fullUrl)
-              const firstImage = item.gallery.find(img => 
-                img && typeof img === 'object' && img.fullUrl
-              );
-              
-              if (firstImage && firstImage.fullUrl) {
-                return (
-                  <div className="flex justify-center">
-                    <div className="relative">
-                      <img 
-                        src={firstImage.fullUrl} 
-                        alt={item.name}
-                        className="w-10 h-10 rounded-lg object-cover border border-gray-200"
-                        onError={(e) => {
-                          // إذا فشل تحميل الصورة، استخدم fallback
-                          e.currentTarget.style.display = 'none';
-                        }}
-                      />
-                      {item.gallery.length > 1 && (
-                        <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                          +{item.gallery.length - 1}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-              }
-            }
-            
-            // إذا لم توجد صور، عرض صورة افتراضية
-            return (
-              <div className="flex justify-center">
-                <div className="w-10 h-10 rounded-lg bg-gray-300 flex items-center justify-center border border-gray-200">
-                  <span className="text-gray-600 text-xs font-medium">
-                    No Images
-                  </span>
-                </div>
-              </div>
-            );
-          }
-        },
+   
       
      
       ]}
