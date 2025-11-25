@@ -201,10 +201,7 @@ export default function UsersPage() {
       showDeletedToggle={false}
       
       // الفلترز المتاحة
-      availableFilters={[
-        // الفلترز الجديدة المطلوبة
-   
-      ]}
+     
        initialData={{ is_ad_request: 1 }} // علشان يبعت type عند الحفظ
       defaultFilters={{ is_ad_request: "1" }} 
     />

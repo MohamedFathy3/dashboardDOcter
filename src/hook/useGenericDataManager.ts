@@ -252,14 +252,14 @@ const applySearchAndFilters = useCallback((): void => {
         const itemValueStr = String(itemValue).toLowerCase().trim();
         
         // مقارنة مرنة تأخذ في الاعتبار الحالات الخاصة
-        if (key === 'active' || key === 'has_clinic') {
-          // للحقول المنطقية: مقارنة "1" مع true و "0" مع false
-          if (filterValue === '1') {
-            return itemValue === true || itemValue === 1 || itemValueStr === 'true' || itemValueStr === '1';
-          } else if (filterValue === '0') {
-            return itemValue === false || itemValue === 0 || itemValueStr === 'false' || itemValueStr === '0';
-          }
-        }
+       if (key === 'active' || key === 'has_clinic' || key === 'is_ad_request') {
+  // للحقول المنطقية: مقارنة "1" مع true و "0" مع false
+  if (filterValue === '1') {
+    return itemValue === true || itemValue === 1 || itemValueStr === 'true' || itemValueStr === '1';
+  } else if (filterValue === '0') {
+    return itemValue === false || itemValue === 0 || itemValueStr === 'false' || itemValueStr === '0';
+  }
+}
         
         // المقارنة العادية للنصوص
         return itemValueStr.includes(filterValue);
