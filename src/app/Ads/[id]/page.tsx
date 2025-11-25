@@ -312,7 +312,7 @@ export default function PostDetailPage() {
               </div>
 
               {/* Comments Section */}
-              <div className="mb-6">
+              {/* <div className="mb-6">
                 <h4 className="font-medium text-gray-900 dark:text-white mb-2">
                   Comments ({post.comments ? post.comments.length : 0})
                 </h4>
@@ -327,7 +327,7 @@ export default function PostDetailPage() {
                 ) : (
                   <p className="text-gray-500 dark:text-gray-400">No comments yet</p>
                 )}
-              </div>
+              </div> */}
 
               {/* Status Section */}
               <div className="pt-6 border-t border-gray-200 dark:border-gray-700">

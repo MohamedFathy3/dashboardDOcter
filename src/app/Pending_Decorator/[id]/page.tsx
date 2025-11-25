@@ -278,7 +278,7 @@ export default function UserProfilePage() {
             <h3 className="font-bold text-lg mb-2">Error</h3>
             <p>{error}</p>
             <button
-              onClick={() => router.push('/users')}
+              onClick={() => router.push('/Pending_Decorator')}
               className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
             >
               Back to Users
@@ -295,7 +295,7 @@ export default function UserProfilePage() {
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">User Not Found</h2>
           <button
-            onClick={() => router.push('/users')}
+            onClick={() => router.push('/Pending_Decorator')}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
           >
             Back to Users
@@ -311,7 +311,7 @@ export default function UserProfilePage() {
         {/* Header */}
         <div className="mb-6">
           <Link
-            href="/users"
+            href="/Pending_Decorator"
             className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4"
           >
             ← Back to Users

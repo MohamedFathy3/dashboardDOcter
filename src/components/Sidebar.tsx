@@ -28,10 +28,10 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { name: 'Dashboard', icon: Home, href: '/' },
-  { name: 'Pending_Docter', icon: Clock, href: '/Pending_Decorator' },
+  { name: 'Doctor', icon: Clock, href: '/Pending_Decorator' },
   { name: 'Job', icon: Computer, href: '/Job' },
   { name: 'Product', icon: Package, href: '/Product' },
-  { name: 'Product_pandding', icon: Package, href: '/Product_pandding' },
+  { name: 'Pending_Product', icon: Package, href: '/Product_pandding' },
   { name: 'Rent', icon: Database, href: '/Rent' },
   { name: 'Ads', icon: Megaphone, href: '/Ads' },
 ]
